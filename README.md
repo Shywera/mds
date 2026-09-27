@@ -28,6 +28,7 @@ svaka je koštala nekoliko sati traženja uzroka.
 | [15 Dizajn bez AI tragova](15-dizajn-bez-ai-tragova.md) | Prepoznatljivi tragovi generiranog dizajna i ispravci |
 | [16 Brief za stranicu](16-brief-za-stranicu.md) | Od pridjeva do brojki, obrazac prije koda |
 | [17 Skillovi i baza znanja](17-skillovi-i-baza-znanja.md) | SKILL.md, references, alat za uređivanje, memorija |
+| [18 Mini igre i zvuk](18-mini-igre-i-zvuk.md) | Sat na zvuku, kalibracija, autoplay, generirane stranice, KV rezultati |
 
 ## Kako se koristi
 
