@@ -266,3 +266,40 @@ najbližu. Koristiti točno dohvaćene težine. [10](10-web-stranice-i-dizajn.md
 
 Informacija je skrivena iza prelaska mišem, kojeg na dodirniku nema. Bitno mora
 biti vidljivo uvijek. [10](10-web-stranice-i-dizajn.md)
+
+## Blok s izmjerenim brojkama prikaže pola redova
+
+| Uzrok | Provjera i ispravak |
+| --- | --- |
+| Stranica je otvorena kao `file://` | Performance API ne prijavljuje `transferSize` za lokalne datoteke, pa se redovi s kilobajtima i brojem zahtjeva sakriju. Posluživati preko `python -m http.server 8080 --bind 127.0.0.1`. [15](15-dizajn-bez-ai-tragova.md) |
+| Vanjski izvor bez `Timing-Allow-Origin` | Ista posljedica na pravoj domeni. Ne prikazivati nulu nego sakriti red, inače stranica tvrdi nešto neistinito |
+
+## Spremanje pregazi tuđu izmjenu iako postoji provjera
+
+| Uzrok | Provjera i ispravak |
+| --- | --- |
+| Vrijeme izmjene uzeto u cijelim sekundama | Dva spremanja u istoj sekundi prođu kao da nije bilo promjene. Uzeti milisekunde: `int(os.stat(p).st_mtime * 1000)`. [17](17-skillovi-i-baza-znanja.md) |
+
+## Datoteka koja nije smjela biti javna pojavila se na stranici
+
+| Uzrok | Provjera i ispravak |
+| --- | --- |
+| GitHub Pages radni tok objavljuje korijen repozitorija (`path: '.'`) | Sve što je u gitu je javno. Nacrte i verzije kandidata **ne dodavati u git**, ostaviti ih nepraćene. Nakon objave provjeriti da vraćaju 404 |
+
+## Provjera u ljusci tiho preskoči pola koraka
+
+| Uzrok | Provjera i ispravak |
+| --- | --- |
+| `grep -c` vezan s `&&` | Kad `grep -c` nađe nula pogotaka, ispiše `0` **i vrati izlazni kod 1**, pa se ostatak lanca ne izvrši. U provjerama koristiti `;` umjesto `&&`, ili `if` blok |
+
+## Naslov s velikim slovima se slijepi pri lomu u dva reda
+
+| Uzrok | Provjera i ispravak |
+| --- | --- |
+| `line-height` ispod 1.0 na verzalu | Velika slova nemaju donje dužine, pa vrhovi drugog reda dodiruju osnovnu liniju prvog. Pod je `1.0`, ugodno `1.02`–`1.08`. [15](15-dizajn-bez-ai-tragova.md) |
+
+## Animacija radi, ali stranica poskakuje
+
+| Uzrok | Provjera i ispravak |
+| --- | --- |
+| Animira se `width`, `padding` ili `margin` | Svaki kadar prisiljava preračun rasporeda. Za liniju koja se izvlači koristiti `transform: scaleX()` uz `transform-origin: left`. [15](15-dizajn-bez-ai-tragova.md) |

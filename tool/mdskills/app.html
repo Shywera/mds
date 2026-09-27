@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>mdskills</title>
+<style>
+  /* Interni alat: gustoca je vaznija od drame. Topla tamna paleta,
+     ista obitelj boja kao kai-sol, ali sve mjere manje i zbijenije. */
+  :root {
+    --paper: #0f0e0c;
+    --paper-2: #16140f;
+    --paper-3: #1c1913;
+    --ink: #f3eee3;
+    --ink-2: #c9c0ae;
+    --ink-3: #8e8676;
+    --rule: #2c2721;
+    --rule-2: #3c362c;
+    --accent: #ff5a2b;
+    --accent-2: #ffb547;
+    --ok: #9fd18a;
+    --warn: #ffb547;
+    --mono: ui-monospace, "Cascadia Mono", "Consolas", monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+    --ease: cubic-bezier(.22,.61,.36,1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--paper); color: var(--ink-2);
+    font: 14px/1.55 var(--sans);
+    display: grid; grid-template-rows: auto 1fr; overflow: hidden;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  button, input, textarea, select { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+
+  /* ---------- traka ---------- */
+  .bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; background: var(--paper-2);
+    border-bottom: 1px solid var(--rule);
+  }
+  .brand { font-weight: 700; color: var(--ink); letter-spacing: .02em; }
+  .brand span { color: var(--accent); }
+  .bar .grow { flex: 1; }
+  .btn {
+    padding: 6px 11px; background: transparent; color: var(--ink);
+    border: 1px solid var(--rule-2); border-radius: 4px; cursor: pointer;
+    white-space: nowrap; transition: border-color .15s var(--ease), color .15s var(--ease);
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn:active { background: var(--paper-3); }
+  .btn[disabled] { opacity: .4; cursor: not-allowed; }
+  .btn-solid { background: var(--accent); border-color: var(--accent); color: #12100c; font-weight: 600; }
+  .btn-solid:hover { background: var(--accent-2); border-color: var(--accent-2); color: #12100c; }
+  .btn-danger:hover { border-color: #e06046; color: #e06046; }
+  input[type=text], input[type=search] {
+    padding: 6px 10px; background: var(--paper); color: var(--ink);
+    border: 1px solid var(--rule-2); border-radius: 4px; min-width: 0;
+  }
+  input::placeholder { color: var(--ink-3); }
+
+  /* ---------- glavni raspored ---------- */
+  .wrap { display: grid; grid-template-columns: 320px 1fr; min-height: 0; }
+  .side {
+    border-right: 1px solid var(--rule); overflow: auto;
+    background: var(--paper-2); padding-bottom: 40px;
+  }
+  .side-top { padding: 8px; position: sticky; top: 0; background: var(--paper-2);
+              border-bottom: 1px solid var(--rule); display: grid; gap: 6px; }
+  .side-top input { width: 100%; }
+  .grp { padding: 10px 8px 2px; }
+  .grp-h {
+    display: flex; align-items: baseline; gap: 6px;
+    font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--ink-3); padding: 4px 4px 6px;
+  }
+  .grp-h .n { color: var(--rule-2); font-weight: 400; letter-spacing: 0; }
+  .grp-h.missing { color: #e06046; }
+  .item {
+    display: grid; grid-template-columns: 1fr auto; gap: 2px 8px;
+    padding: 6px 8px; border-radius: 4px; cursor: pointer;
+    border-left: 2px solid transparent;
+  }
+  .item:hover { background: var(--paper-3); }
+  .item.sel { background: var(--paper-3); border-left-color: var(--accent); }
+  .item .nm { color: var(--ink); overflow-wrap: anywhere; }
+  .item .sub { grid-column: 1/-1; font-size: 12px; color: var(--ink-3); overflow-wrap: anywhere; }
+  .item .tag { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+  .item.ref { padding-left: 20px; }
+  .item.ref .nm { color: var(--ink-2); font-size: 13px; }
+  .bad { color: var(--warn); font-size: 12px; }
+  .side .empty { padding: 8px; color: var(--ink-3); font-size: 12px; }
+
+  /* ---------- glavno podrucje ---------- */
+  .main { display: grid; grid-template-rows: auto 1fr; min-width: 0; min-height: 0; }
+  .head {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    padding: 8px 12px; border-bottom: 1px solid var(--rule); background: var(--paper-2);
+  }
+  .head .p { font-family: var(--mono); font-size: 12px; color: var(--ink-3); overflow-wrap: anywhere; }
+  .head .p b { color: var(--ink); font-weight: 600; }
+  .pane { overflow: auto; min-height: 0; }
+  .doc { max-width: 860px; margin: 0 auto; padding: 28px 24px 80px; }
+  textarea.ed {
+    width: 100%; height: 100%; min-height: 0; resize: none; display: block;
+    padding: 20px 24px; background: var(--paper); color: var(--ink);
+    border: 0; font: 13px/1.7 var(--mono); tab-size: 2;
+  }
+  .hidden { display: none !important; }
+
+  /* ---------- markdown ---------- */
+  .doc h1, .doc h2, .doc h3, .doc h4 { color: var(--ink); line-height: 1.25; margin: 1.4em 0 .5em; }
+  .doc h1 { font-size: 26px; } .doc h2 { font-size: 21px; }
+  .doc h3 { font-size: 17px; } .doc h4 { font-size: 15px; }
+  .doc h1:first-child, .doc h2:first-child { margin-top: 0; }
+  .doc p, .doc ul, .doc ol, .doc blockquote, .doc table, .doc pre { margin: 0 0 .9em; }
+  .doc ul, .doc ol { padding-left: 1.3em; }
+  .doc li { margin: .2em 0; }
+  .doc ul li { list-style: none; position: relative; }
+  .doc ul li::before { content: ""; position: absolute; left: -1em; top: .72em;
+                       width: 6px; height: 1px; background: var(--accent); }
+  .doc ol { list-style: decimal; }
+  .doc strong { color: var(--ink); }
+  .doc code { font-family: var(--mono); font-size: .92em; background: var(--paper-3);
+              padding: 1px 5px; border-radius: 3px; color: var(--accent-2); }
+  .doc pre { background: var(--paper-2); border: 1px solid var(--rule); border-radius: 4px;
+             padding: 12px 14px; overflow: auto; }
+  .doc pre code { background: none; padding: 0; color: var(--ink-2); }
+  .doc blockquote { border-left: 2px solid var(--rule-2); padding-left: 14px; color: var(--ink-3); }
+  .doc hr { border: 0; border-top: 1px solid var(--rule); margin: 1.6em 0; }
+  .doc table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  .doc th, .doc td { border: 1px solid var(--rule); padding: 6px 9px; text-align: left; vertical-align: top; }
+  .doc th { background: var(--paper-2); color: var(--ink); }
+  .doc .wl { border-bottom: 1px dashed var(--accent); }
+  .doc .wl.missing { color: var(--warn); border-bottom-style: dotted; }
+  .fm { border: 1px solid var(--rule); border-radius: 4px; margin-bottom: 20px; }
+  .fm-h { padding: 6px 10px; background: var(--paper-2); border-bottom: 1px solid var(--rule);
+          font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+  .fm-row { display: grid; grid-template-columns: 130px 1fr; gap: 10px; padding: 6px 10px;
+            border-top: 1px solid var(--rule); font-size: 13px; }
+  .fm-row:first-of-type { border-top: 0; }
+  .fm-row .k { color: var(--ink-3); font-family: var(--mono); font-size: 12px; }
+  .fm-row .v { color: var(--ink); overflow-wrap: anywhere; }
+
+  /* ---------- dijalog i obavijest ---------- */
+  dialog { border: 1px solid var(--rule-2); border-radius: 6px; background: var(--paper-2);
+           color: var(--ink-2); padding: 0; min-width: min(460px, 92vw); }
+  dialog::backdrop { background: rgba(0,0,0,.6); }
+  .dlg-h { padding: 12px 14px; border-bottom: 1px solid var(--rule); color: var(--ink); font-weight: 600; }
+  .dlg-b { padding: 14px; display: grid; gap: 10px; }
+  .dlg-b label { display: grid; gap: 4px; font-size: 12px; color: var(--ink-3); }
+  .dlg-b input, .dlg-b select { width: 100%; padding: 7px 9px; background: var(--paper);
+    border: 1px solid var(--rule-2); border-radius: 4px; color: var(--ink); }
+  .dlg-f { padding: 12px 14px; border-top: 1px solid var(--rule); display: flex; gap: 8px; justify-content: flex-end; }
+  .toast {
+    position: fixed; right: 14px; bottom: 14px; z-index: 50;
+    padding: 9px 13px; border-radius: 4px; border: 1px solid var(--rule-2);
+    background: var(--paper-3); color: var(--ink); font-size: 13px; max-width: 420px;
+    opacity: 0; transform: translateY(6px); transition: opacity .2s, transform .2s;
+  }
+  .toast.show { opacity: 1; transform: none; }
+  .toast.err { border-color: #e06046; color: #ffb9a8; }
+  .toast.ok { border-color: var(--ok); }
+
+  @media (max-width: 860px) {
+    .wrap { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+    .side { max-height: 38vh; border-right: 0; border-bottom: 1px solid var(--rule); }
+  }
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <span class="brand">md<span>skills</span></span>
+  <span class="grow"></span>
+  <button class="btn" id="bNote">+ .md</button>
+  <button class="btn" id="bSkill">+ skill</button>
+  <button class="btn" id="bReload" title="Osvjezi popis (r)">Osvjezi</button>
+</div>
+
+<div class="wrap">
+  <aside class="side">
+    <div class="side-top">
+      <input type="search" id="q" placeholder="Filtriraj po imenu ili opisu…" autocomplete="off" />
+    </div>
+    <div id="tree"></div>
+  </aside>
+
+  <section class="main">
+    <div class="head">
+      <span class="p" id="crumb">Odaberite datoteku s lijeve strane.</span>
+      <span class="grow"></span>
+      <button class="btn" id="bEdit" disabled>Uredi</button>
+      <button class="btn btn-solid hidden" id="bSave">Spremi</button>
+      <button class="btn hidden" id="bCancel">Odustani</button>
+      <button class="btn" id="bRef" disabled title="Nova referenca u ovom skillu">+ referenca</button>
+      <button class="btn btn-danger" id="bTrash" disabled>U smece</button>
+    </div>
+    <div class="pane" id="pane">
+      <div class="doc" id="view"></div>
+      <textarea class="ed hidden" id="ed" spellcheck="false"></textarea>
+    </div>
+  </section>
+</div>
+
+<dialog id="dlg">
+  <form method="dialog">
+    <div class="dlg-h" id="dlgH">Novo</div>
+    <div class="dlg-b" id="dlgB"></div>
+    <div class="dlg-f">
+      <button class="btn" value="cancel">Odustani</button>
+      <button class="btn btn-solid" value="ok" id="dlgOk">Napravi</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+
+/* ==========================================================
+   1 · Stanje
+   ========================================================== */
+var state = {
+  roots: [],
+  index: {},        // ime bez .md -> put (za [[wikilink]])
+  current: null,    // { path, content, meta, mtime, skillDir }
+  editing: false,
+  filter: ""
+};
+
+var $ = function (id) { return document.getElementById(id); };
+
+function toast(msg, kind) {
+  var t = $("toast");
+  t.textContent = msg;
+  t.className = "toast show " + (kind || "");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(function () { t.className = "toast " + (kind || ""); }, 3200);
+}
+
+function api(path, body) {
+  var opt = body
+    ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }
+    : {};
+  return fetch(path, opt).then(function (r) {
+    return r.json().then(function (j) {
+      if (!r.ok || j.error) throw new Error(j.error || ("HTTP " + r.status));
+      return j;
+    });
+  });
+}
+
+/* ==========================================================
+   2 · Markdown -> HTML (podskup: naslovi, liste, tablice,
+   kod, citati, linkovi, [[wikilinks]]). Namjerno malen i bez
+   ovisnosti; nije puni CommonMark.
+   ========================================================== */
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function inline(s) {
+  s = esc(s);
+  var code = [];
+  s = s.replace(/`([^`]+)`/g, function (_m, c) {
+    code.push(c); return " " + (code.length - 1) + " ";
+  });
+  s = s.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, function (_m, target, label) {
+    var key = target.trim().toLowerCase().replace(/\.md$/, "");
+    var hit = state.index[key];
+    return '<a class="wl' + (hit ? "" : " missing") + '" href="#" data-wl="' +
+      esc(target.trim()) + '">' + esc(label || target) + "</a>";
+  });
+  s = s.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, '<em>[slika: $1]</em>');
+  s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  s = s.replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g,
+    '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
+  s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  s = s.replace(/(^|\W)_([^_]+)_(\W|$)/g, "$1<em>$2</em>$3");
+  s = s.replace(/(^|[^*])\*([^*]+)\*/g, "$1<em>$2</em>");
+  s = s.replace(/~~([^~]+)~~/g, "<del>$1</del>");
+  s = s.replace(/ (\d+) /g, function (_m, i) { return "<code>" + code[+i] + "</code>"; });
+  return s;
+}
+
+function mdToHtml(src) {
+  var out = [], lines = src.replace(/\r\n/g, "\n").split("\n"), i = 0;
+
+  /* frontmatter kao mala tablica */
+  if (lines[0] === "---") {
+    var fm = [], j = 1;
+    while (j < lines.length && lines[j] !== "---") { fm.push(lines[j]); j++; }
+    if (j < lines.length) {
+      var rows = fm.filter(function (l) { return /^\S[^:]*:/.test(l); }).map(function (l) {
+        var k = l.slice(0, l.indexOf(":")), v = l.slice(l.indexOf(":") + 1);
+        return '<div class="fm-row"><span class="k">' + esc(k) + '</span><span class="v">' +
+          inline(v.trim().replace(/^["']|["']$/g, "")) + "</span></div>";
+      }).join("");
+      out.push('<div class="fm"><div class="fm-h">frontmatter</div>' + rows + "</div>");
+      i = j + 1;
+    }
+  }
+
+  var para = [];
+  function flush() {
+    if (para.length) { out.push("<p>" + inline(para.join(" ")) + "</p>"); para = []; }
+  }
+
+  for (; i < lines.length; i++) {
+    var l = lines[i];
+
+    if (/^```/.test(l)) {                                  /* kod */
+      flush();
+      var buf = [];
+      i++;
+      while (i < lines.length && !/^```/.test(lines[i])) { buf.push(lines[i]); i++; }
+      out.push("<pre><code>" + esc(buf.join("\n")) + "</code></pre>");
+      continue;
+    }
+    if (/^\s*$/.test(l)) { flush(); continue; }
+    if (/^#{1,6}\s/.test(l)) {
+      flush();
+      var n = l.match(/^#+/)[0].length;
+      out.push("<h" + n + ">" + inline(l.replace(/^#+\s*/, "")) + "</h" + n + ">");
+      continue;
+    }
+    if (/^\s*([-*_])\1{2,}\s*$/.test(l)) { flush(); out.push("<hr />"); continue; }
+    if (/^\s*>/.test(l)) {                                 /* citat */
+      flush();
+      var q = [];
+      while (i < lines.length && /^\s*>/.test(lines[i])) { q.push(lines[i].replace(/^\s*>\s?/, "")); i++; }
+      i--;
+      out.push("<blockquote>" + inline(q.join(" ")) + "</blockquote>");
+      continue;
+    }
+    if (/^\s*\|.*\|\s*$/.test(l) && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i + 1] || "")) {
+      flush();                                             /* tablica */
+      var cells = function (row) {
+        return row.trim().replace(/^\||\|$/g, "").split("|").map(function (c) { return c.trim(); });
+      };
+      var head = cells(l);
+      i += 2;
+      var body = [];
+      while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) { body.push(cells(lines[i])); i++; }
+      i--;
+      out.push("<table><thead><tr>" + head.map(function (c) {
+        return "<th>" + inline(c) + "</th>";
+      }).join("") + "</tr></thead><tbody>" + body.map(function (r) {
+        return "<tr>" + r.map(function (c) { return "<td>" + inline(c) + "</td>"; }).join("") + "</tr>";
+      }).join("") + "</tbody></table>");
+      continue;
+    }
+    if (/^\s*([-*+]|\d+\.)\s/.test(l)) {                   /* liste */
+      flush();
+      var ordered = /^\s*\d+\./.test(l), items = [];
+      while (i < lines.length && /^\s*([-*+]|\d+\.)\s/.test(lines[i])) {
+        var txt = lines[i].replace(/^\s*([-*+]|\d+\.)\s+/, "");
+        i++;
+        while (i < lines.length && /^\s{2,}\S/.test(lines[i]) &&
+               !/^\s*([-*+]|\d+\.)\s/.test(lines[i])) {
+          txt += " " + lines[i].trim(); i++;
+        }
+        items.push("<li>" + inline(txt) + "</li>");
+      }
+      i--;
+      out.push((ordered ? "<ol>" : "<ul>") + items.join("") + (ordered ? "</ol>" : "</ul>"));
+      continue;
+    }
+    para.push(l.trim());
+  }
+  flush();
+  return out.join("\n");
+}
+
+/* ==========================================================
+   3 · Stablo
+   ========================================================== */
+function matches(text) {
+  return !state.filter || (text || "").toLowerCase().indexOf(state.filter) !== -1;
+}
+
+function renderTree() {
+  var host = $("tree");
+  host.innerHTML = "";
+  state.index = {};
+
+  state.roots.forEach(function (root) {
+    (root.files || []).forEach(function (f) {
+      state.index[f.name.replace(/\.md$/i, "").toLowerCase()] = f.path;
+    });
+    (root.skills || []).forEach(function (s) {
+      state.index[s.folder.toLowerCase()] = s.skill.path;
+      (s.refs || []).forEach(function (r) {
+        state.index[r.name.replace(/\.md$/i, "").toLowerCase()] = r.path;
+      });
+    });
+  });
+
+  state.roots.forEach(function (root) {
+    var wrap = document.createElement("div");
+    wrap.className = "grp";
+    var shown = 0;
+    var body = document.createElement("div");
+
+    if (root.kind === "skills") {
+      (root.skills || []).forEach(function (s) {
+        var hay = s.folder + " " + (s.meta.description || "") + " " + (s.meta.name || "");
+        var refHits = (s.refs || []).filter(function (r) { return matches(r.name); });
+        if (!matches(hay) && refHits.length === 0) return;
+        shown++;
+        body.appendChild(item({
+          path: s.skill.path, name: s.folder,
+          sub: s.meta.description || "(bez opisa)",
+          tag: s.symlink ? "symlink" : "skill",
+          bad: s.problems, skillDir: s.dir
+        }));
+        (state.filter ? refHits : s.refs || []).forEach(function (r) {
+          body.appendChild(item({ path: r.path, name: r.rel, ref: true, skillDir: s.dir }));
+        });
+      });
+    } else {
+      (root.files || []).forEach(function (f) {
+        if (!matches(f.rel)) return;
+        shown++;
+        body.appendChild(item({ path: f.path, name: f.rel }));
+      });
+    }
+
+    var h = document.createElement("div");
+    h.className = "grp-h" + (root.exists ? "" : " missing");
+    h.innerHTML = "<span>" + esc(root.label) + "</span><span class='n'>" +
+      (root.exists ? shown : "mapa ne postoji") + "</span>";
+    wrap.appendChild(h);
+    if (root.exists && shown === 0) {
+      var e = document.createElement("div");
+      e.className = "empty";
+      e.textContent = state.filter ? "nema pogodaka" : "prazno";
+      wrap.appendChild(e);
+    }
+    wrap.appendChild(body);
+    host.appendChild(wrap);
+  });
+}
+
+function item(o) {
+  var d = document.createElement("div");
+  d.className = "item" + (o.ref ? " ref" : "") +
+    (state.current && state.current.path === o.path ? " sel" : "");
+  var html = '<span class="nm">' + esc(o.name) + "</span>";
+  html += o.tag ? '<span class="tag">' + esc(o.tag) + "</span>" : "<span></span>";
+  if (o.sub) html += '<span class="sub">' + esc(o.sub) + "</span>";
+  if (o.bad && o.bad.length) html += '<span class="sub bad">! ' + esc(o.bad.join(" · ")) + "</span>";
+  d.innerHTML = html;
+  d.addEventListener("click", function () { open(o.path, o.skillDir); });
+  return d;
+}
+
+/* ==========================================================
+   4 · Otvaranje, uredivanje, spremanje
+   ========================================================== */
+function open(path, skillDir) {
+  if (state.editing && !confirm("Imate nespremljene izmjene. Otvoriti drugu datoteku?")) return;
+  api("/api/file?path=" + encodeURIComponent(path)).then(function (f) {
+    state.current = { path: f.path, content: f.content, meta: f.meta, mtime: f.mtime, skillDir: skillDir };
+    state.editing = false;
+    paint();
+    renderTree();
+  }).catch(function (e) { toast(e.message, "err"); });
+}
+
+function paint() {
+  var c = state.current;
+  $("bEdit").disabled = !c;
+  $("bTrash").disabled = !c;
+  $("bRef").disabled = !(c && c.skillDir);
+  $("bSave").classList.toggle("hidden", !state.editing);
+  $("bCancel").classList.toggle("hidden", !state.editing);
+  $("bEdit").classList.toggle("hidden", state.editing);
+  $("view").classList.toggle("hidden", state.editing);
+  $("ed").classList.toggle("hidden", !state.editing);
+
+  if (!c) { $("crumb").textContent = "Odaberite datoteku s lijeve strane."; return; }
+  var parts = c.path.split("/");
+  $("crumb").innerHTML = esc(parts.slice(0, -1).join("/") + "/") +
+    "<b>" + esc(parts[parts.length - 1]) + "</b>";
+
+  if (state.editing) {
+    $("ed").value = c.content;
+    $("ed").focus();
+  } else {
+    $("view").innerHTML = mdToHtml(c.content);
+    $("view").querySelectorAll("[data-wl]").forEach(function (a) {
+      a.addEventListener("click", function (ev) {
+        ev.preventDefault();
+        var key = a.dataset.wl.toLowerCase().replace(/\.md$/, "");
+        var hit = state.index[key];
+        if (hit) { open(hit); return; }
+        toast('Nema datoteke "' + a.dataset.wl + '". Napravite je gumbom + .md', "err");
+      });
+    });
+    $("pane").scrollTop = 0;
+  }
+}
+
+function save() {
+  var c = state.current;
+  if (!c) return;
+  var text = $("ed").value;
+  api("/api/save", { path: c.path, content: text, mtime: c.mtime }).then(function (r) {
+    c.content = text;
+    c.mtime = r.mtime;
+    state.editing = false;
+    paint();
+    toast("Spremljeno", "ok");
+    reload(true);
+  }).catch(function (e) { toast(e.message, "err"); });
+}
+
+function reload(keep) {
+  return api("/api/tree").then(function (t) {
+    state.roots = t.roots;
+    renderTree();
+    if (!keep) toast("Popis osvjezen", "ok");
+  }).catch(function (e) { toast(e.message, "err"); });
+}
+
+/* ==========================================================
+   5 · Dijalozi za novo
+   ========================================================== */
+function dialog(title, fields, onOk) {
+  var dlg = $("dlg");
+  $("dlgH").textContent = title;
+  $("dlgB").innerHTML = fields.map(function (f) {
+    if (f.type === "select") {
+      return "<label>" + esc(f.label) + "<select name='" + f.name + "'>" +
+        f.options.map(function (o) {
+          return "<option value='" + esc(o.value) + "'>" + esc(o.label) + "</option>";
+        }).join("") + "</select></label>";
+    }
+    return "<label>" + esc(f.label) + "<input name='" + f.name + "' value='" +
+      esc(f.value || "") + "' placeholder='" + esc(f.placeholder || "") + "' /></label>";
+  }).join("");
+  dlg.returnValue = "";
+  dlg.showModal();
+  var form = dlg.querySelector("form");
+  form.onsubmit = null;
+  dlg.onclose = function () {
+    if (dlg.returnValue !== "ok") return;
+    var vals = {};
+    fields.forEach(function (f) {
+      var el = $("dlgB").querySelector("[name='" + f.name + "']");
+      vals[f.name] = el ? el.value.trim() : "";
+    });
+    onOk(vals);
+  };
+  var first = $("dlgB").querySelector("input, select");
+  if (first) first.focus();
+}
+
+function mdRoots() {
+  return state.roots.filter(function (r) { return r.kind === "md"; })
+    .map(function (r) { return { value: r.path, label: r.label + "  (" + r.path + ")" }; });
+}
+function skillRoots() {
+  return state.roots.filter(function (r) { return r.kind === "skills"; })
+    .map(function (r) { return { value: r.path, label: r.label + "  (" + r.path + ")" }; });
+}
+
+$("bNote").addEventListener("click", function () {
+  var opts = mdRoots();
+  if (!opts.length) return toast("Nema ni jednog md korijena u config.json", "err");
+  dialog("Nova .md datoteka", [
+    { name: "root", label: "Mapa", type: "select", options: opts },
+    { name: "name", label: "Ime datoteke", placeholder: "npr. biljeska-o-necemu" }
+  ], function (v) {
+    if (!v.name) return toast("Ime je obavezno", "err");
+    api("/api/new-note", { root: v.root, name: v.name }).then(function (r) {
+      reload(true).then(function () { open(r.path); toast("Napravljeno", "ok"); });
+    }).catch(function (e) { toast(e.message, "err"); });
+  });
+});
+
+$("bSkill").addEventListener("click", function () {
+  var opts = skillRoots();
+  if (!opts.length) return toast("Nema ni jednog skills korijena u config.json", "err");
+  dialog("Novi skill", [
+    { name: "root", label: "Mapa", type: "select", options: opts },
+    { name: "name", label: "Ime skilla", placeholder: "npr. pisanje-ponuda" },
+    { name: "description", label: "Opis (kada se koristi)", placeholder: "Jedna recenica." }
+  ], function (v) {
+    if (!v.name) return toast("Ime je obavezno", "err");
+    api("/api/new-skill", v).then(function (r) {
+      reload(true).then(function () { open(r.path); toast("Skill napravljen", "ok"); });
+    }).catch(function (e) { toast(e.message, "err"); });
+  });
+});
+
+$("bRef").addEventListener("click", function () {
+  var c = state.current;
+  if (!c || !c.skillDir) return;
+  dialog("Nova referenca", [
+    { name: "name", label: "Ime datoteke", placeholder: "npr. primjeri" }
+  ], function (v) {
+    if (!v.name) return toast("Ime je obavezno", "err");
+    api("/api/new-ref", { dir: c.skillDir, name: v.name }).then(function (r) {
+      reload(true).then(function () { open(r.path, c.skillDir); toast("Napravljeno", "ok"); });
+    }).catch(function (e) { toast(e.message, "err"); });
+  });
+});
+
+$("bTrash").addEventListener("click", function () {
+  var c = state.current;
+  if (!c) return;
+  if (!confirm("Premjestiti u .trash?\n\n" + c.path + "\n\nDatoteka se ne brise, samo seli.")) return;
+  api("/api/trash", { path: c.path }).then(function () {
+    state.current = null;
+    state.editing = false;
+    paint();
+    reload(true);
+    toast("Premjesteno u .trash", "ok");
+  }).catch(function (e) { toast(e.message, "err"); });
+});
+
+$("bEdit").addEventListener("click", function () { state.editing = true; paint(); });
+$("bSave").addEventListener("click", save);
+$("bCancel").addEventListener("click", function () {
+  if ($("ed").value !== state.current.content &&
+      !confirm("Odbaciti izmjene?")) return;
+  state.editing = false; paint();
+});
+$("bReload").addEventListener("click", function () { reload(false); });
+$("q").addEventListener("input", function () {
+  state.filter = this.value.trim().toLowerCase();
+  renderTree();
+});
+
+/* ==========================================================
+   6 · Tipkovnica
+   ========================================================== */
+document.addEventListener("keydown", function (e) {
+  var typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+    e.preventDefault();
+    if (state.editing) save();
+    return;
+  }
+  if (e.key === "Escape" && state.editing) {
+    e.preventDefault();
+    $("bCancel").click();
+    return;
+  }
+  if (typing) return;
+  if (e.key === "e" && state.current && !state.editing) { e.preventDefault(); $("bEdit").click(); }
+  if (e.key === "r") { e.preventDefault(); reload(false); }
+  if (e.key === "/") { e.preventDefault(); $("q").focus(); }
+});
+
+window.addEventListener("beforeunload", function (e) {
+  if (state.editing && $("ed").value !== state.current.content) {
+    e.preventDefault();
+    e.returnValue = "";
+  }
+});
+
+reload(true);
+</script>
+</body>
+</html>

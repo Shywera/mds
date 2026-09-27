@@ -1,0 +1,29 @@
+{
+  "roots": [
+    {
+      "label": "Skills (agents)",
+      "path": "~/.agents/skills",
+      "kind": "skills"
+    },
+    {
+      "label": "Skills (claude)",
+      "path": "~/.claude/skills",
+      "kind": "skills"
+    },
+    {
+      "label": "Memory",
+      "path": "~/.claude/projects/C--Users-krist/memory",
+      "kind": "md"
+    },
+    {
+      "label": "SiteSpec",
+      "path": "~/Desktop/SiteSpec",
+      "kind": "md"
+    },
+    {
+      "label": "Biljeznica",
+      "path": "~/mdskills/notes",
+      "kind": "md"
+    }
+  ]
+}

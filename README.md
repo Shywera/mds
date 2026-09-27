@@ -25,11 +25,27 @@ svaka je koštala nekoliko sati traženja uzroka.
 | [12 Domena: tiskarstvo](12-domena-tiskarstvo.md) | Normativi, strojevi, skladište, nazivlje |
 | [13 Katalog zamki](13-katalog-zamki.md) | Sve zamke na jednom mjestu, za brzo pretraživanje |
 | [14 Kontrolne liste](14-kontrolne-liste.md) | Nova aplikacija, novi modul, prije puštanja u rad |
+| [15 Dizajn bez AI tragova](15-dizajn-bez-ai-tragova.md) | Prepoznatljivi tragovi generiranog dizajna i ispravci |
+| [16 Brief za stranicu](16-brief-za-stranicu.md) | Od pridjeva do brojki, obrazac prije koda |
+| [17 Skillovi i baza znanja](17-skillovi-i-baza-znanja.md) | SKILL.md, references, alat za uređivanje, memorija |
 
 ## Kako se koristi
 
 Prije početka novog projekta pročitati [01](01-nacela-rada.md), [02](02-skelet-aplikacije.md)
 i odgovarajuću kontrolnu listu iz [14](14-kontrolne-liste.md).
+
+Prije izrade javne stranice pročitati [10](10-web-stranice-i-dizajn.md),
+[15](15-dizajn-bez-ai-tragova.md) i [16](16-brief-za-stranicu.md).
+
+Gotovi postupci za pomoćnika stoje u mapi [`skills/`](skills/): `ship-site`
+(objava i provjera živih stranica) i `site-brief` (od briefa do izgrađene
+stranice). Kopiraju se u `~/.claude/skills/`. Objašnjenje formata je u
+[17](17-skillovi-i-baza-znanja.md).
+
+Alat za pregled i uređivanje svega ovoga stoji u [`tool/mdskills/`](tool/mdskills/):
+Python iz standardne biblioteke, dvoklik na `start.cmd`, otvara se na
+`http://127.0.0.1:7777`. Kopirati `config.example.json` u `config.json` i
+upisati svoje mape.
 
 Kada nešto ne radi a nema očitog razloga, prvo pretražiti
 [13 Katalog zamki](13-katalog-zamki.md). Velik dio problema koji izgledaju kao
