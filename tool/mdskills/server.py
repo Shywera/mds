@@ -114,9 +114,12 @@ def read_frontmatter(path):
 def file_entry(path, root):
     st = os.stat(path)
     rel = os.path.relpath(path, root["path"]).replace("\\", "/")
+    meta, _has = read_frontmatter(path)
+    # fmname: slug iz frontmattera. Veze u dvostrukim uglatim zagradama
+    # gadaju njega, a ne ime datoteke, pa mora biti u popisu.
     return {"path": path.replace("\\", "/"), "rel": rel,
             "name": os.path.basename(path), "size": st.st_size,
-            "mtime": int(st.st_mtime)}
+            "fmname": meta.get("name"), "mtime": int(st.st_mtime)}
 
 
 def list_md(root, base=None, depth=0):

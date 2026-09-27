@@ -14,7 +14,7 @@ of what kai-sol sells.
 
 ## The two targets
 
-### kai-sol.com — the business site
+### kai-sol.com, the business site
 
 | | |
 | --- | --- |
@@ -34,7 +34,7 @@ of what kai-sol sells.
 experiments and candidate pages **untracked** rather than committing them; that is how
 four redesign candidates stayed local while the real pages shipped.
 
-### shaiyex.com — the WoW personal site
+### shaiyex.com, the personal site
 
 | | |
 | --- | --- |

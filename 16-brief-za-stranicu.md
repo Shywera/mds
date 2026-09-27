@@ -31,9 +31,9 @@ Samo na ova dva vrijedi čekati odgovor. Ostalo se izvede ili pretpostavi.
 1. **Ponašanje stranice**: jedan zaključan zaslon bez skrolanja / obično skrolanje /
    skrolanje s pristajanjem / vodoravno.
 2. **Razina detalja**:
-   - *točna replika* — svaka brojka je zadana, slijedi se doslovno,
-   - *čvrst okvir* — dane su paleta, tekst i resursi, vrijednosti gibanja se biraju,
-   - *osjećaj* — dana je tema, ostalo se komponira.
+   - *točna replika*: svaka brojka je zadana, slijedi se doslovno,
+   - *čvrst okvir*: dane su paleta, tekst i resursi, vrijednosti gibanja se biraju,
+   - *osjećaj*: dana je tema, ostalo se komponira.
 
 ## Ispuni iz repozitorija, ne iz čovjeka
 
@@ -68,7 +68,7 @@ Razlika između pogađanja i replike je isključivo u desnom stupcu.
 | Naslov | "nešto pamtljivo" | red 1 `Pure`, red 2 `Zero` u akcentu, `clamp(5rem,10vw,12rem)`, `line-height 0.8` |
 | Hover | "neka se pomakne" | `translateY(-30px) rotate(-12deg) scale(1.15)` kroz `0.5s cubic-bezier(0.34,1.56,0.64,1)` |
 | Prijelaz | "neka se kul zavrti" | 0→360° uz blur 0→15px kroz `0.6s power2.in`, zamjena teksture u vrhu, pa 360→720° uz blur→0 kroz `1.5s back.out(0.7)` |
-| Čestice | "mjehurići" | PNG, jedan na `400ms`, `10–30px`, prozirnost `0.2–0.6`, dizanje `-110vh` uz `+30px` zanošenja i `360°` kroz `4–10s` |
+| Čestice | "mjehurići" | PNG, jedan na `400ms`, `10-30px`, prozirnost `0.2-0.6`, dizanje `-110vh` uz `+30px` zanošenja i `360°` kroz `4-10s` |
 
 ## Resursi se ne izmišljaju
 

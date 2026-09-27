@@ -392,11 +392,13 @@ function renderTree() {
   state.roots.forEach(function (root) {
     (root.files || []).forEach(function (f) {
       state.index[f.name.replace(/\.md$/i, "").toLowerCase()] = f.path;
+      if (f.fmname) state.index[f.fmname.toLowerCase()] = f.path;
     });
     (root.skills || []).forEach(function (s) {
       state.index[s.folder.toLowerCase()] = s.skill.path;
       (s.refs || []).forEach(function (r) {
         state.index[r.name.replace(/\.md$/i, "").toLowerCase()] = r.path;
+        if (r.fmname) state.index[r.fmname.toLowerCase()] = r.path;
       });
     });
   });

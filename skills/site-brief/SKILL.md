@@ -13,7 +13,7 @@ nothing like what was pictured. This skill closes that gap before any code is wr
 
 ## The artefact
 
-**`~/Desktop/SiteSpec/SITE-SPEC-TEMPLATE.md`** — a 17-section fill-in sheet,
+**`~/Desktop/SiteSpec/SITE-SPEC-TEMPLATE.md`** is a 17-section fill-in sheet,
 reusable for any subject. It exists because a soda-can landing-page prompt was reverse
 engineered into fields: "flavour" became **variant**, "the can" became **centerpiece**,
 "cherries and leaves" became **decor layers**, "bubbles" became **ambient particles**, and
@@ -30,8 +30,8 @@ from guesses, with the eight judgment calls marked `[MY CALL]` so he can overrul
    the repo and fill the brief from it: tokens, fonts, copy, prices, interactions. Never
    ask for a value that is sitting in a CSS file.
 3. **Two dials decide everything else**, and they are the only fields worth blocking on:
-   - **Page behaviour** — locked single viewport / normal scroll / scroll-snap / horizontal
-   - **Detail dial** — exact replica (follow every number literally) / tight spec (the user gives
+   - **Page behaviour**: locked single viewport / normal scroll / scroll-snap / horizontal
+   - **Detail dial**: exact replica (follow every number literally) / tight spec (the user gives
      palette, copy, assets; you choose motion in a coherent style) / vibes (you compose)
 4. **State the audience in one line** before handing anything over, so he can correct it.
 5. **Mark every invented value.** Anything not from the user or the repo gets flagged, and
