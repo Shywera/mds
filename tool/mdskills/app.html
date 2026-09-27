@@ -87,7 +87,10 @@
   .item:hover { background: var(--paper-3); }
   .item.sel { background: var(--paper-3); border-left-color: var(--accent); }
   .item .nm { color: var(--ink); overflow-wrap: anywhere; }
-  .item .sub { grid-column: 1/-1; font-size: 12px; color: var(--ink-3); overflow-wrap: anywhere; }
+  .item .sub {
+    grid-column: 1/-1; font-size: 12px; color: var(--ink-3); overflow-wrap: anywhere;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
   .item .tag { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
   .item.ref { padding-left: 20px; }
   .item.ref .nm { color: var(--ink-2); font-size: 13px; }
@@ -412,24 +415,34 @@ function renderTree() {
     if (root.kind === "skills") {
       (root.skills || []).forEach(function (s) {
         var hay = s.folder + " " + (s.meta.description || "") + " " + (s.meta.name || "");
-        var refHits = (s.refs || []).filter(function (r) { return matches(r.name); });
+        var refHits = (s.refs || []).filter(function (r) {
+          return matches(r.rel + " " + (r.title || "") + " " + (r.blurb || ""));
+        });
         if (!matches(hay) && refHits.length === 0) return;
         shown++;
         body.appendChild(item({
-          path: s.skill.path, name: s.folder,
+          path: s.skill.path, name: s.meta.name || s.folder,
           sub: s.meta.description || "(bez opisa)",
           tag: s.symlink ? "symlink" : "skill",
           bad: s.problems, skillDir: s.dir
         }));
         (state.filter ? refHits : s.refs || []).forEach(function (r) {
-          body.appendChild(item({ path: r.path, name: r.rel, ref: true, skillDir: s.dir }));
+          body.appendChild(item({
+            path: r.path, name: r.title || r.rel, sub: r.blurb || "",
+            ref: true, skillDir: s.dir
+          }));
         });
       });
     } else {
       (root.files || []).forEach(function (f) {
-        if (!matches(f.rel)) return;
+        if (!matches(f.rel + " " + (f.title || "") + " " + (f.blurb || ""))) return;
         shown++;
-        body.appendChild(item({ path: f.path, name: f.rel }));
+        body.appendChild(item({
+          path: f.path,
+          name: f.title || f.rel,
+          sub: f.blurb || "",
+          tag: f.kindtag || ""
+        }));
       });
     }
 

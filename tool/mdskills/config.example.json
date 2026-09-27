@@ -24,6 +24,11 @@
       "label": "Biljeznica",
       "path": "~/mdskills/notes",
       "kind": "md"
+    },
+    {
+      "label": "Prirucnik (mds)",
+      "path": "~/mds",
+      "kind": "md"
     }
   ]
 }

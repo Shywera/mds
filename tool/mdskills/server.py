@@ -104,11 +104,81 @@ def read_frontmatter(path):
     if end == -1:
         return {}, False
     meta = {}
+    in_metadata = False
     for line in head[3:end].splitlines():
-        if ":" in line and not line.startswith(" "):
-            k, v = line.split(":", 1)
-            meta[k.strip()] = v.strip().strip('"').strip("'")
+        if not line.strip():
+            continue
+        indented = line[0] in " \t"
+        if ":" not in line:
+            continue
+        k, v = line.split(":", 1)
+        k, v = k.strip(), v.strip().strip('"').strip("'")
+        if not indented:
+            in_metadata = (k == "metadata")
+            meta[k] = v
+        elif in_metadata and k == "type":
+            meta["metadata_type"] = v
     return meta, True
+
+
+TYPE_WORDS = ("project", "feedback", "reference", "user", "memory", "skill")
+
+
+def prettify(stem):
+    """iz `project_kai_sol_site` napravi `Kai Sol Site`"""
+    parts = [p for p in re.split(r"[-_\s]+", stem.strip()) if p]
+    if len(parts) > 1 and parts[0].lower() in TYPE_WORDS:
+        parts = parts[1:]
+    out = [p if (p.isupper() or any(c.isdigit() for c in p)) else p.capitalize()
+           for p in parts]
+    return " ".join(out) or stem
+
+
+def describe(path, meta):
+    """Vrati (naslov, jedna linija o cemu je).
+
+    Naslov: prvi naslov u tekstu, pa slug iz frontmattera, pa ime datoteke.
+    Linija: `description` iz frontmattera, pa prva prava recenica teksta.
+    Cilj je da se u popisu vidi sto je datoteka bez otvaranja."""
+    try:
+        with open(path, encoding="utf-8", errors="replace") as f:
+            head = f.read(4096)
+    except OSError:
+        head = ""
+
+    body = head
+    if body.startswith("---"):
+        end = body.find("\n---", 3)
+        if end != -1:
+            body = body[end + 4:]
+
+    title = ""
+    m = re.search(r"^#{1,6}[ \t]+(.+?)[ \t]*#*$", body, re.M)
+    if m:
+        title = re.sub(r"^[#\s]+", "", m.group(1).strip())
+    if not title:
+        title = prettify(meta.get("name") or
+                         os.path.splitext(os.path.basename(path))[0])
+
+    blurb = (meta.get("description") or "").strip()
+    if not blurb:
+        after = body[m.end():] if m else body
+        for raw in after.splitlines():
+            line = raw.strip()
+            if not line or line.startswith(("#", "|", "```", "---", "<!--", "!")):
+                continue
+            line = re.sub(r"^\s*>+\s*", "", line)                 # citat
+            line = re.sub(r"^\s*(?:[-*+]|\d+\.)\s+", "", line)    # oznaka popisa
+            line = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", line)  # [tekst](veza) -> tekst
+            line = re.sub(r"[*_`]", "", line).strip()
+            if len(line) > 12:
+                blurb = line
+                break
+    blurb = " ".join(blurb.split())
+    if len(blurb) > 150:
+        cut = blurb[:150].rsplit(" ", 1)[0]
+        blurb = cut + "\u2026"
+    return title, blurb
 
 
 def file_entry(path, root):
@@ -117,8 +187,11 @@ def file_entry(path, root):
     meta, _has = read_frontmatter(path)
     # fmname: slug iz frontmattera. Veze u dvostrukim uglatim zagradama
     # gadaju njega, a ne ime datoteke, pa mora biti u popisu.
+    title, blurb = describe(path, meta)
     return {"path": path.replace("\\", "/"), "rel": rel,
             "name": os.path.basename(path), "size": st.st_size,
+            "title": title, "blurb": blurb,
+            "kindtag": meta.get("metadata_type") or "",
             "fmname": meta.get("name"), "mtime": int(st.st_mtime)}
 
 
