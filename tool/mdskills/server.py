@@ -135,7 +135,7 @@ def prettify(stem):
 
 
 def describe(path, meta):
-    """Vrati (naslov, jedna linija o cemu je).
+    """Vrati (naslov, jedna linija o cemu je, sifra arhetipa ili "").
 
     Naslov: prvi naslov u tekstu, pa slug iz frontmattera, pa ime datoteke.
     Linija: `description` iz frontmattera, pa prva prava recenica teksta.
@@ -152,7 +152,7 @@ def describe(path, meta):
         if end != -1:
             body = body[end + 4:]
 
-    title = ""
+    title, code = "", ""
     m = re.search(r"^#{1,6}[ \t]+(.+?)[ \t]*#*$", body, re.M)
     if m:
         title = re.sub(r"^[#\s]+", "", m.group(1).strip())
@@ -160,7 +160,23 @@ def describe(path, meta):
         title = prettify(meta.get("name") or
                          os.path.splitext(os.path.basename(path))[0])
 
-    blurb = (meta.get("description") or "").strip()
+    # Ocisti naslov: bez backtickova, bez zvjezdica, bez rijeci "hallmark".
+    title = re.sub(r"[`*]", "", title).strip()
+    title = re.sub(r"^hallmark\s+", "", title, flags=re.I)
+
+    # Sifra arhetipa na pocetku (H8, Ft5, N1b, C1, HP3) nije ime nego oznaka:
+    # izvadi je u zasebno polje pa je prikazi sitno sa strane.
+    mc = re.match(r"^([A-Za-z]{1,3}\d{1,2}[a-z]?)\s*[\u00b7:\u2013\u2014-]\s*(.+)$", title)
+    if mc:
+        code, title = mc.group(1), mc.group(2).strip()
+
+    # Podnaslov odvojen crticom je opis, ne dio imena.
+    ms = re.match(r"^(.{3,}?)\s+[\u2013\u2014]\s+(.+)$", title)
+    tail = ""
+    if ms:
+        title, tail = ms.group(1).strip(), ms.group(2).strip()
+
+    blurb = (meta.get("description") or "").strip() or tail
     if not blurb:
         after = body[m.end():] if m else body
         for raw in after.splitlines():
@@ -178,7 +194,7 @@ def describe(path, meta):
     if len(blurb) > 150:
         cut = blurb[:150].rsplit(" ", 1)[0]
         blurb = cut + "\u2026"
-    return title, blurb
+    return title, blurb, code
 
 
 def file_entry(path, root):
@@ -187,10 +203,10 @@ def file_entry(path, root):
     meta, _has = read_frontmatter(path)
     # fmname: slug iz frontmattera. Veze u dvostrukim uglatim zagradama
     # gadaju njega, a ne ime datoteke, pa mora biti u popisu.
-    title, blurb = describe(path, meta)
+    title, blurb, code = describe(path, meta)
     return {"path": path.replace("\\", "/"), "rel": rel,
             "name": os.path.basename(path), "size": st.st_size,
-            "title": title, "blurb": blurb,
+            "title": title, "blurb": blurb, "code": code,
             "kindtag": meta.get("metadata_type") or "",
             "fmname": meta.get("name"), "mtime": int(st.st_mtime)}
 
