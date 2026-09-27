@@ -18,6 +18,32 @@ python server.py
 Preglednik se otvori sam. Prekid: `Ctrl+C` u prozoru servera.
 Ako ne zelite da se preglednik otvori: `python server.py --no-browser`.
 
+## Precac i taskbar
+
+`python make_icon.py` napravi `icon.ico`, bez vanjskih biblioteka: PNG se
+sastavi rucno preko `zlib`, pa se zapakira u ICO kontejner.
+
+Precac se napravi ovako:
+
+```powershell
+$sh = New-Object -ComObject WScript.Shell
+$s = $sh.CreateShortcut("$([Environment]::GetFolderPath('Desktop'))\mdskills.lnk")
+$s.TargetPath = "$PWD\start.cmd"
+$s.WorkingDirectory = "$PWD"
+$s.IconLocation = "$PWD\icon.ico,0"
+$s.WindowStyle = 7
+$s.Save()
+```
+
+**Pinanje na taskbar se ne da skriptirati.** Na Windowsu 11, provjereno na
+buildu 26200, glagol *Pin to taskbar* ne postoji medu shell glagolima
+(`Shell.Application` ih izlista, njega nema). Zadnji korak ide rucno: desni
+klik na precac, pa *Pin to taskbar*. Isti precac lezi i u Start meniju, pa se
+moze pinati i iz pretrage.
+
+`start.cmd` je napisan tako da drugi klik ne padne na zauzet port: ako server
+vec slusa na 7777, samo otvori preglednik.
+
 ## Sto moze
 
 - **Pregled** svake `.md` datoteke, renderirano (naslovi, liste, tablice, kod,
